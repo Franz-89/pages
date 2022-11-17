@@ -25,15 +25,16 @@ switch ($_POST['action']){
         
         switch ($_POST['action']){
             case 'upload_ff':
-                $comercializadora    = $_POST['comercializadora'];
-                $fecha_recepcion_ff  = $date->fromToFormat($_POST['fecha_recepcion_ff'], 'd/m/Y', 'Y-m-d');
-                $fecha_carga_ff      = (isset($_POST['fecha_carga_ff']) & !empty($_POST['fecha_carga_ff'])) ? $date->fromToFormat($_POST['fecha_carga_ff'], 'd/m/Y', 'Y-m-d') : '';
-                $fecha_validacion_ff = (isset($_POST['fecha_validacion_ff']) & !empty($_POST['fecha_validacion_ff'])) ? $date->fromToFormat($_POST['fecha_validacion_ff'], 'd/m/Y', 'Y-m-d') : '';
-                $fras_cargadas       = $_POST['fras_cargadas'];
-                $abonos_cargados     = $_POST['abonos_cargados'];
-                $comentarios         = $_POST['comentarios_ff'];
-                $ruta                = $_POST['ruta_ff'];
-                $checkCarpeta        = 'CARGA BBDD';
+                $comercializadora       = $_POST['comercializadora'];
+                $fecha_recepcion_ff     = $date->fromToFormat($_POST['fecha_recepcion_ff'], 'd/m/Y', 'Y-m-d');
+                $fecha_carga_ff         = (isset($_POST['fecha_carga_ff']) & !empty($_POST['fecha_carga_ff'])) ? $date->fromToFormat($_POST['fecha_carga_ff'], 'd/m/Y', 'Y-m-d') : '';
+                $fecha_validacion_ff    = (isset($_POST['fecha_validacion_ff']) & !empty($_POST['fecha_validacion_ff'])) ? $date->fromToFormat($_POST['fecha_validacion_ff'], 'd/m/Y', 'Y-m-d') : '';
+                $fecha_validacion_te_ff = (isset($_POST['fecha_validacion_te_ff']) & !empty($_POST['fecha_validacion_te_ff'])) ? $date->fromToFormat($_POST['fecha_validacion_te_ff'], 'd/m/Y', 'Y-m-d') : '';
+                $fras_cargadas          = $_POST['fras_cargadas'];
+                $abonos_cargados        = $_POST['abonos_cargados'];
+                $comentarios            = $_POST['comentarios_ff'];
+                $ruta                   = $_POST['ruta_ff'];
+                $checkCarpeta           = 'CARGA BBDD';
                 
                 if ($abonos_cargados>$fras_cargadas){
                     echo "Error. Las facturas cargadas ($fras_cargadas) no pueden ser menores que los abonos cargados ($abonos_cargados).";
@@ -85,7 +86,7 @@ switch ($_POST['action']){
         
         switch ($_POST['action']){
             case 'upload_ff':
-                $Conn->Query("INSERT INTO seguimiento_cliente_ff (CLIENTE, COMERCIALIZADORA, FECHA_RECEPCION, FECHA_CARGA, FECHA_VALIDACION, FACTURAS_CARGADAS, ABONOS_CARGADOS, COMENTARIOS, RUTA, LINK_FF, MES, DIR) VALUES ('$cli', '$comercializadora', '$fecha_recepcion_ff', '$fecha_carga_ff', '$fecha_validacion_ff', '$fras_cargadas', '$abonos_cargados', '$comentarios', '$ruta', '$strLinks', '$mes', '$strDirFilename')");
+                $Conn->Query("INSERT INTO seguimiento_cliente_ff (CLIENTE, COMERCIALIZADORA, FECHA_RECEPCION, FECHA_CARGA, FECHA_VALIDACION, FECHA_VALIDACION_TE, FACTURAS_CARGADAS, ABONOS_CARGADOS, COMENTARIOS, RUTA, LINK_FF, MES, DIR) VALUES ('$cli', '$comercializadora', '$fecha_recepcion_ff', '$fecha_carga_ff', '$fecha_validacion_ff', '$fras_cargadas', '$abonos_cargados', '$comentarios', '$ruta', '$strLinks', '$mes', '$strDirFilename')");
                 unset($comercializadora, $fecha_recepcion_ff, $fecha_carga_ff, $fecha_validacion_ff);
                 
                 break;

@@ -716,6 +716,7 @@ switch ($_GET['action']){
                                     DATE_FORMAT(FECHA_RECEPCION, '%d/%m/%Y'),
                                     DATE_FORMAT(FECHA_CARGA, '%d/%m/%Y'),
                                     DATE_FORMAT(FECHA_VALIDACION, '%d/%m/%Y'),
+                                    DATE_FORMAT(FECHA_VALIDACION_TE, '%d/%m/%Y'),
                                     FACTURAS_CARGADAS,
                                     ABONOS_CARGADOS,
                                     COMENTARIOS,
@@ -727,7 +728,7 @@ switch ($_GET['action']){
                                     ", true);
         
         if (!isset($datos) || empty($datos) || !$datos){
-            $datos[] = array('', '', '', '', '', '', '', '', '', '', '');
+            $datos[] = array('', '', '', '', '', '', '', '', '', '', '', '');
         } else {
             foreach ($datos as $num_row=>$row){
                 $row[] = '<a class="btn btn-default btn-sm btn-warning fa fa-edit" href="modffseguimiento.php?id='.$row['ID'].'"></a><button class="btn btn-default btn-sm btn-danger fa fa-remove" id="del" value='.$row['ID'].' onclick="delFfSeguimiento($(this).val())"></button>';

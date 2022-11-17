@@ -136,10 +136,10 @@ $empleado = isset($_SESSION['seguimiento_cliente']['empleado']) ? $_SESSION['seg
                                     <div class="form-group">
                                         <label>Fecha recepeción</label>
                                         <div class="input-group date">
-                                          <div class="input-group-addon">
-                                            <i class="fa fa-calendar"></i>
-                                          </div>
-                                          <input type="text" class="form-control pull-right fecha" id="fecha_recepcion_ff" name="fecha_recepcion_ff" value="<?php echo date('d/m/Y'); ?>" required>
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
+                                            <input type="text" class="form-control pull-right fecha" id="fecha_recepcion_ff" name="fecha_recepcion_ff" value="<?php echo date('d/m/Y'); ?>" required>
                                         </div>
                                     </div>
                                 </div>
@@ -148,9 +148,9 @@ $empleado = isset($_SESSION['seguimiento_cliente']['empleado']) ? $_SESSION['seg
                                     <div class="form-group">
                                         <label>Fecha carga intranet</label>
                                         <div class="input-group date">
-                                          <div class="input-group-addon">
-                                            <i class="fa fa-calendar"></i>
-                                          </div>
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
                                           <input type="text" class="form-control pull-right fecha" id="fecha_carga_ff" name="fecha_carga_ff" value="<?php echo date('d/m/Y'); ?>">
                                         </div>
                                     </div>
@@ -160,10 +160,22 @@ $empleado = isset($_SESSION['seguimiento_cliente']['empleado']) ? $_SESSION['seg
                                     <div class="form-group">
                                         <label>Fecha validación</label>
                                         <div class="input-group date">
-                                          <div class="input-group-addon">
-                                            <i class="fa fa-calendar"></i>
-                                          </div>
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
                                           <input type="text" class="form-control pull-right fecha" id="fecha_validacion_ff" name="fecha_validacion_ff" value="">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label>Fecha validación TE</label>
+                                        <div class="input-group date">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
+                                          <input type="text" class="form-control pull-right fecha" id="fecha_validacion_te_ff" name="fecha_validacion__te_ff" value="">
                                         </div>
                                     </div>
                                 </div>
@@ -224,6 +236,7 @@ $empleado = isset($_SESSION['seguimiento_cliente']['empleado']) ? $_SESSION['seg
                                         <th>RECEPCIÓN</th>
                                         <th>CARGA</th>
                                         <th>VALIDACIÓN</th>
+                                        <th>VALIDACIÓN TE</th>
                                         <th>FRAS CARGADAS</th>
                                         <th>ABONOS CARGADOS</th>
                                         <th>COMENTARIOS</th>
