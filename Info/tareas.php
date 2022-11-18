@@ -5,7 +5,7 @@ $sql_table 	= $fichero;
 require($_SERVER['DOCUMENT_ROOT']."/Enertrade/php/func/includes.php");
 
 session_start();
-$empleado     = (isset($_SESSION['info']['tareas']['empleado'])) ? $_SESSION['info']['tareas']['empleado'] : $usuario;
+$empleado     = (isset($_SESSION['info']['tareas']['empleado'])) ? $_SESSION['info']['tareas']['empleado'] : '';
 $asignado_por = (isset($_SESSION['info']['tareas']['asignado_por'])) ? $_SESSION['info']['tareas']['asignado_por'] : '';
 session_write_close();
 
