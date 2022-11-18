@@ -86,8 +86,8 @@ switch ($_POST['action']){
         
         switch ($_POST['action']){
             case 'upload_ff':
-                $Conn->Query("INSERT INTO seguimiento_cliente_ff (CLIENTE, COMERCIALIZADORA, FECHA_RECEPCION, FECHA_CARGA, FECHA_VALIDACION, FECHA_VALIDACION_TE, FACTURAS_CARGADAS, ABONOS_CARGADOS, COMENTARIOS, RUTA, LINK_FF, MES, DIR) VALUES ('$cli', '$comercializadora', '$fecha_recepcion_ff', '$fecha_carga_ff', '$fecha_validacion_ff', '$fras_cargadas', '$abonos_cargados', '$comentarios', '$ruta', '$strLinks', '$mes', '$strDirFilename')");
-                unset($comercializadora, $fecha_recepcion_ff, $fecha_carga_ff, $fecha_validacion_ff);
+                $Conn->Query("INSERT INTO seguimiento_cliente_ff (CLIENTE, COMERCIALIZADORA, FECHA_RECEPCION, FECHA_CARGA, FECHA_VALIDACION, FECHA_VALIDACION_TE, FACTURAS_CARGADAS, ABONOS_CARGADOS, COMENTARIOS, RUTA, LINK_FF, MES, DIR) VALUES ('$cli', '$comercializadora', '$fecha_recepcion_ff', '$fecha_carga_ff', '$fecha_validacion_ff', '$fecha_validacion_te_ff', '$fras_cargadas', '$abonos_cargados', '$comentarios', '$ruta', '$strLinks', '$mes', '$strDirFilename')");
+                unset($comercializadora, $fecha_recepcion_ff, $fecha_carga_ff, $fecha_validacion_ff, $fecha_validacion_te_ff);
                 
                 break;
                 

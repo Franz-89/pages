@@ -381,7 +381,8 @@ include ($_SERVER['DOCUMENT_ROOT']."/Enertrade/php/sections/header.php");
                 searchable	: false
             }]
 		}).column(2).search($('#empleado').val()).draw()
-	  
+	
+    filterData2($('#asignado_por').val())
 
 </script>
 </body>
