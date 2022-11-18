@@ -829,6 +829,14 @@ switch ($_GET['action']){
         session_write_close();
         
         break;
+
+    case 'save_asignado_por':
+        
+        session_start();
+        $_SESSION['info']['tareas']['asignado_por'] = $_POST['asignado_por'];
+        session_write_close();
+        
+        break;
         
     case 'dwd_tareas_gestionadas':
     case 'dwd_tareas_en_curso':

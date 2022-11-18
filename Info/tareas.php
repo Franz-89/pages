@@ -2,9 +2,13 @@
 $fichero 	= str_replace(".php", "", basename(__FILE__));
 $sql_table 	= $fichero;
 
-$empleado = (isset($_SESSION['info']['tareas']['empleado'])) ? $_SESSION['info']['tareas']['empleado'] : '';
-    
 require($_SERVER['DOCUMENT_ROOT']."/Enertrade/php/func/includes.php");
+
+session_start();
+$empleado     = (isset($_SESSION['info']['tareas']['empleado'])) ? $_SESSION['info']['tareas']['empleado'] : $usuario;
+$asignado_por = (isset($_SESSION['info']['tareas']['asignado_por'])) ? $_SESSION['info']['tareas']['asignado_por'] : '';
+session_write_close();
+
 include ($_SERVER['DOCUMENT_ROOT']."/Enertrade/php/sections/header.php");
 ?>
 
@@ -44,17 +48,16 @@ include ($_SERVER['DOCUMENT_ROOT']."/Enertrade/php/sections/header.php");
                     
                     <?php
                     
-                    switch ($usuario){
-                        case 'vmrodriguez@enertrade.es':
-                        case 'mmontero@enertrade.es':
-                        case 'slizarralde@enertrade.es':
-                            $disabled = '';
-                            break;
-                        default:
-                            $disabled = 'disabled="disabled"';
-                            break;
-                    }
-                    
+                        switch ($usuario){
+                            case 'vmrodriguez@enertrade.es':
+                            case 'mmontero@enertrade.es':
+                            case 'slizarralde@enertrade.es':
+                                $disabled = '';
+                                break;
+                            default:
+                                $disabled = 'disabled="disabled"';
+                                break;
+                        }
                     ?>
                     
                     <div class="col-md-2">
@@ -64,21 +67,22 @@ include ($_SERVER['DOCUMENT_ROOT']."/Enertrade/php/sections/header.php");
                                 
                                 <?php
                                 
-                                $Lista = new Lista('mail_empleados');
-                                
-                                switch ($usuario){
-                                    case 'vmrodriguez@enertrade.es':
-                                    case 'mmontero@enertrade.es':
-                                    case 'slizarralde@enertrade.es':
-                                        $Lista->print_list($empleado);
-                                        break;
-                                        
-                                    default:
-                                        echo "<option>$usuario</option>";
-                                        
-                                }
+                                    $Lista = new Lista('mail_empleados');
+                                    
+                                    switch ($usuario){
+                                        case 'vmrodriguez@enertrade.es':
+                                        case 'mmontero@enertrade.es':
+                                        case 'slizarralde@enertrade.es':
+                                            echo '<option value=""></option>';
+                                            $Lista->print_list($empleado);
+                                            break;
+                                            
+                                        default:
+                                            echo "<option>$usuario</option>";
+                                    }
                                 
                                 ?>
+
                             </select>
                          </div>
                      </div>
@@ -98,9 +102,8 @@ include ($_SERVER['DOCUMENT_ROOT']."/Enertrade/php/sections/header.php");
                             <label>Prioridad</label>
                             <select class="form-control select2" style="width: 100%;" data-placeholder="Prioridad" name="prioridad">
                                 <?php
-                                $Lista->change_list('prioridad');
-                                $Lista->print_list(10);
-                                unset($Lista);
+                                    $Lista->change_list('prioridad');
+                                    $Lista->print_list(10);
                                 ?>
                             </select>
                          </div>
@@ -138,9 +141,27 @@ include ($_SERVER['DOCUMENT_ROOT']."/Enertrade/php/sections/header.php");
                 <div class="col-md-12">
                     <h2>En curso</h2>
                     <div class="col-md-12">
-                        <a class="btn btn-app" href="js_actions.php?action=dwd_tareas_en_curso">
-                            <i class="fa fa-file-excel-o"></i> Descargar
-                        </a>
+                        <div class="col-md-1">
+                            <a class="btn btn-app" href="js_actions.php?action=dwd_tareas_en_curso">
+                                <i class="fa fa-file-excel-o"></i> Descargar
+                            </a>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>Filtro "asignado por"</label>
+                                <select class="form-control select2" style="width: 100%;" name="asignado_por" id="asignado_por" onchange="filterData2($(this).val())"  >
+                                    <option value="" selected></option>
+                                    <?php
+                                        $Lista->change_list('mail_empleados');
+                                        $Lista->print_list($asignado_por);
+                                        unset($Lista);
+                                    ?>
+
+                                </select>
+                            </div>
+                        </div>
+
                     </div>
                     <table id="tareas_no_gestionadas" class="table table-bordered table-striped">
                         <thead>
@@ -284,12 +305,27 @@ include ($_SERVER['DOCUMENT_ROOT']."/Enertrade/php/sections/header.php");
         $('#tareas_gestionadas').DataTable().column(2).search(dato).draw();
         saveEmpleado(dato);
     }
+
+    function filterData2(dato){
+        $('#tareas_no_gestionadas').DataTable().column(3).search(dato).draw();
+        $('#tareas_gestionadas').DataTable().column(3).search(dato).draw();
+        saveAsignadoPor(dato);
+    }
     
     function saveEmpleado(empleado){
         $.ajax({
             url: "js_actions.php?action=save_empleado",
             method: "POST",
             data: {empleado: empleado},
+            async: false
+        })
+    }
+
+    function saveAsignadoPor(asignado_por){
+        $.ajax({
+            url: "js_actions.php?action=save_asignado_por",
+            method: "POST",
+            data: {asignado_por: asignado_por},
             async: false
         })
     }
