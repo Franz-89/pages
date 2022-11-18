@@ -3,7 +3,7 @@
 require($_SERVER['DOCUMENT_ROOT']."/Enertrade/php/func/includes.php");
 
 $action = $_POST['action'];
-$Conn 	= new Conn('mainsip', 'develop');
+
 
 switch ($action){
 	case 'PS':
@@ -11,11 +11,13 @@ switch ($action){
     case 'desvio_consumo':
     case 'descarga_ps':
 		$cli 	= $_POST['cli'];
-		$ID 	= $Conn->oneData("SELECT Id FROM gestion_clientes WHERE name='".$cli."'");
+		$CalculosSimples = new CalculosSimples;
+		$ID 	= $CalculosSimples->getIdCliente($cli);
+		unset($CalculosSimples);
 		break;
 }
 
-
+$Conn 	= new Conn('mainsip', 'develop');
 
 switch ($action){
 	
@@ -131,7 +133,247 @@ switch ($action){
 		
 		break;
 		
-	case "BBDD":
+	//REVISIÓN DE LAS ULTIMAS FECHAS DE LAS FRAS
+	case 'ultima_fecha_fra':
+
+		//Si no se han seleccionado las fecha interrumpe
+		if (!isset($_POST['desde']) || !isset($_POST['hasta'])){break;}
+
+		//Ultima fecha de facturación por cups
+		$strSQL = "SELECT CONCAT('$cli', '') cliente, a.cups, MAX(a.Fecha_hasta) max_fecha_hasta, MAX(a.Fecha_factura) max_fecha_factura, b.estado FROM facturas a
+                    RIGHT JOIN (
+						SELECT
+							cups,
+                            estado
+						FROM clientes
+						WHERE Grupo='$cli') b
+					ON a.cups=b.cups
+                    WHERE a.id_cliente='$ID' GROUP BY a.cups";
+		$val_fechas = $Conn->getArray($strSQL, true);
+		
+		//Si no hay facturas desde hace más de 3 meses o no hay facturas
+        $date = new DateClass;
+        $date->subtract(0,3);
+        $max_hasta = new DateClass;
+        $max_factura = new DateClass;
+        
+        foreach ($val_fechas as $num_row=>$row){
+            $val_fechas[$num_row]['observaciones'] = '';
+            
+            if (empty($row['max_fecha_hasta'])){
+                $val_fechas[$num_row]['observaciones'] = ' No hay facturas emitidas para este cups.';
+                continue;
+            }
+            
+            $max_hasta->stringToDate($row['max_fecha_hasta']);
+            $max_factura->stringToDate($row['max_fecha_factura']);
+            
+            if ($max_hasta->vardate<=$date->vardate){
+				$val_fechas[$num_row]['observaciones'] .= ' La ultima factura fecha hasta de hace más de 3 meses.';
+			}
+            if ($max_factura->vardate<=$date->vardate){
+				$val_fechas[$num_row]['observaciones'] .= ' Este CUPS no emite desde hace más de 3 meses.';
+			}
+
+			$val_fechas[$num_row]['fecha_consulta'] = date('Y-m-d');
+        }
+
+		unset($Conn);
+		$Conn = new Conn('local', 'enertrade');
+		$values = implode_values($val_fechas);
+		$Conn->Query("DELETE FROM revisiones_fechas_fra WHERE CLIENTE='$cli'");
+		$Conn->Query("INSERT INTO revisiones_fechas_fra (
+						CLIENTE,
+						CUPS,
+						MAX_FECHA_HASTA,
+						MAX_FECHA_FACTURA,
+						ESTADO,
+						OBSERVACIONES,
+						FECHA_CONSULTA)
+					VALUES $values
+		");
+
+
+		break;
+	
+	//REVISIÓN DE CONSUMOS ACUMULADOS O 0
+	case 'revision_consumos':
+
+		//Si no se han seleccionado las fecha interrumpe
+		if (!isset($_POST['desde']) || !isset($_POST['hasta'])){break;}
+
+		//Consumos NT
+		$strSQL = "SELECT
+						cups,
+						mes,
+						total,
+						termino_energia
+					FROM datos_notelemedidas
+					WHERE grupo='$cli'
+					AND mes>='".(date('Y')-1)."-01-01'
+					ORDER BY cups, mes DESC";
+
+        $consumos_nt = $Conn->getArray($strSQL, true);
+		$Array 		 = new ArrayClass($consumos_nt);
+		$consumos_nt = $array->assocFromColumn('cups');
+		unset($Array);
+        
+        
+        foreach ($consumos_nt as $cups=>$consumos){
+            $cnt_0 = 0;
+            $is_0  = false;
+            $msg   = '';
+            
+            //Comprueba si hay 6 meses sin consumos
+            foreach ($consumos as $num_row=>$row){
+                if ($row['total']==0){
+                    ++$cnt_0;
+                } else {
+                    $cnt_0 = 0;
+                }
+                
+                if ($cnt_0 >=6){
+                    $msg .= '6 o más meses sin consumo.';
+                    $break;
+                }
+            }
+            if (!empty($msg)){
+                $linea = array();
+                $linea['CLIENTE']       = $cli;
+                $linea['CUPS']          = $cups;
+                $linea['MES']           = '';
+                $linea['CONSUMO']       = '';
+                $linea['PROMEDIO']      = '';
+                $linea['TE']            = '';
+                $linea['PRECIO €/kW']   = '';
+                $linea['OBSERVACIONES'] = $msg;
+                $val_consumos_mes[]     = $linea;
+                unset($linea);
+            }
+            
+            //Comprueba si hay consumos acumulados
+            foreach ($consumos as $num_row=>$row){
+                if ($num_row==17){break;}   //Si ha comprobado 18 meses corta
+                if ($row['total']==0){
+                    if ($is_0){continue;}
+                    $is_0 = true;
+                    
+                } else {
+                    $is_0 = false;
+                    $avg = 0;
+                    $cnt = 0;
+                    //Promedio de los 12 meses anteriores sin los meses con consumo a 0
+                    for ($x=1; $x<=12; $x++){
+                        if (isset($consumos[($num_row+$x)])){
+                            if ($x==1 && $consumos[($num_row+$x)]['total']!=0){break;} //Si la siguiente factura no tiene un 0 corta
+                            $avg += $consumos[($num_row+$x)]['total'];
+                            if ($consumos[($num_row+$x)]['total']!=0){++$cnt;}
+                        } else {
+                            break;
+                        }
+                    }
+                    
+                    if ($cnt!=0){
+                        $avg = ($avg/$cnt)*2;
+                        if ($row['total']>=$avg){
+                            $linea = array();
+                            $linea['CLIENTE']       = $cli;
+                            $linea['CUPS']          = $cups;
+                            $linea['MES']           = $row['mes'];
+                            $linea['CONSUMO']       = $row['total'];
+                            $linea['PROMEDIO']      = round(($avg/2), 0);
+                            $linea['TE']            = $row['termino_energia'];
+                            $linea['PRECIO €/kW']   = $row['termino_energia']/$row['total'];
+                            $linea['OBSERVACIONES'] = "Consumo más del doble que el promedio de los anteriores 12 meses sin consumo a 0.";
+                            $val_consumos_mes[]     = $linea;
+                            unset($linea);
+                        }
+                    }
+                }
+            }
+        }
+
+		$values = implode_values($val_consumos_mes);
+
+		unset($Conn);
+		$Conn = new Conn('local', 'enertrade');
+		$Conn->Query("DELETE FROM revisiones_consumos WHERE CLIENTE='$cli'");
+		$Conn->Query("INSERT INTO revisiones_consumos (
+						CLIENTE,
+						CUPS,
+						MES,
+						CONSUMO,
+						PROMEDIO_ANUAL_SIN_CEROS,
+						TE,
+						PRECIO_EUR_KW,
+						OBSERVACIONES)
+					VALUES $values
+		");
+		unset($Conn, $values, $val_consumos_mes);
+
+		break;
+
+		
+	case 'revisiones_duplicadas':
+
+		//Si no se han seleccionado las fecha interrumpe
+		if (!isset($_POST['desde']) || !isset($_POST['hasta'])){break;}
+
+		$val_duplicadas		= array();
+		$header_duplicadas 	= array('CUPS', 'NUM_FRA', 'EMISION', 'DESDE', 'HASTA', 'TOT_FRA', 'OBSERVACIONES');
+
+		/*
+		El numero de fras duplicadas se puede sacar con una query mysql sencilla
+		Falta todo este case por redactar
+		*/
+
+
+		//DUPLICADAS	#####################################
+		$msg = '';
+				
+		if (!array_key_exists($row['numero_factura'], $val_duplicadas) && $cnt_num_fra[$row['numero_factura']] > 1){$msg .= "Num fra duplicado";}
+		if (!array_key_exists($row['numero_factura'], $val_duplicadas) && $cnt_id_duplicadas[$row['id_duplicada']] > 1){$msg .= "Mismas fechas e importes (num registros = ".$cnt_id_duplicadas[$row['id_duplicada']].")";}
+		
+		if (!empty($msg)){
+			$linea 									= array_fill_keys($header_duplicadas, '');
+			$linea['CUPS'] 							= $CUPS;
+			$linea['NUM_FRA'] 						= $row['numero_factura'];
+			$linea['EMISION'] 						= date_format($emision, 'd/m/Y');
+			$linea['DESDE'] 						= date_format($desde, 'd/m/Y');
+			$linea['HASTA'] 						= date_format($hasta, 'd/m/Y');
+			$linea['TOT_FRA'] 						= $row['Total_factura'];
+			$linea['OBSERVACIONES'] 				= $msg;
+			$val_duplicadas[$row['numero_factura']] = $linea;
+			unset($linea);
+		}
+		
+		//NEGATIVAS DUPLICADAS
+		$msg = '';
+		if (!array_key_exists($CUPS, $val_duplicadas) && isset($dos_negativas[$CUPS]) && $dos_negativas[$CUPS]['cuenta']>1){
+			$num_negativas = $dos_negativas[$CUPS]['cuenta'];
+			$msg .= "Más de una negativa en el mismo periodo ($num_negativas)";
+			unset($num_negativas);
+		}
+		
+		$date_neg_dup = new dateClass;
+		if (!empty($msg)){
+			$linea 									= array_fill_keys($header_duplicadas, '');
+			$linea['CUPS'] 							= $CUPS;
+			$linea['NUM_FRA'] 						= '';
+			$linea['EMISION'] 						= '';
+			$linea['DESDE'] 						= $date_neg_dup->fromToFormat($dos_negativas[$CUPS]['Fecha_desde']);
+			$linea['HASTA'] 						= $date_neg_dup->fromToFormat($dos_negativas[$CUPS]['Fecha_hasta']);
+			$linea['TOT_FRA'] 						= '';
+			$linea['OBSERVACIONES'] 				= $msg;
+			$val_duplicadas[$CUPS]                  = $linea;
+			unset($linea);
+		}
+
+		break;
+
+
+	//BBDD
+	case 'BBDD':
 		
 		if (!isset($_POST['desde']) || !isset($_POST['hasta'])){
 			header ("Location: revisiones.php?cli=$cli");
