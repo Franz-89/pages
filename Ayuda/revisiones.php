@@ -19,7 +19,7 @@ include ($_SERVER['DOCUMENT_ROOT']."/Enertrade/php/sections/header.php");
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        Revisiones&nbsp;<a href='https://sites.google.com/view/wikienertrade/formaci%C3%B3n/franet#h.8kq7d94rqg5v' target="_blank"><i class="fa fa-info"></i></a>
+        Revisioness&nbsp;<a href='https://sites.google.com/view/wikienertrade/formaci%C3%B3n/franet#h.8kq7d94rqg5v' target="_blank"><i class="fa fa-info"></i></a>
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Intranet interna</a></li>
