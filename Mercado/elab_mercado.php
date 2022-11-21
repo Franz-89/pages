@@ -134,7 +134,7 @@ include ($_SERVER['DOCUMENT_ROOT']."/Enertrade/php/sections/header.php");
                                 <div class="form-group">
                                     <label>Ajuste estimado:</label>
 
-                                    <input type="number" class="form-control" id="ajuste_estimado" name="ajuste_estimado" value=100>
+                                    <input type="number" class="form-control" id="ajuste_estimado" name="ajuste_estimado" value=58>
                                 </div>
                                 <div class="box-footer">
                                     <button type="submit" name="action" value="reinosa_elec_gas" class="btn btn-primary" onclick="confirmacion()"><i class="fa fa-envelope"></i>Enviar</button>
