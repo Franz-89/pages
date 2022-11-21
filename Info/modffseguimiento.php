@@ -10,8 +10,9 @@ $row = $Conn->oneRow("SELECT * FROM seguimiento_cliente_ff WHERE ID=$id");
 unset($Conn);
 
 $date = new DateClass;
-$row['FECHA_CARGA'] = $date->fromToFormat($row['FECHA_CARGA']);
-$row['FECHA_VALIDACION'] = $date->fromToFormat($row['FECHA_VALIDACION']);
+$row['FECHA_CARGA']         = $date->fromToFormat($row['FECHA_CARGA']);
+$row['FECHA_VALIDACION']    = $date->fromToFormat($row['FECHA_VALIDACION']);
+$row['FECHA_VALIDACION_TE'] = $date->fromToFormat($row['FECHA_VALIDACION_TE']);
 unset($date);
 
 include ($_SERVER['DOCUMENT_ROOT']."/Enertrade/php/sections/header.php");
@@ -48,11 +49,11 @@ include ($_SERVER['DOCUMENT_ROOT']."/Enertrade/php/sections/header.php");
 				<div class="form-group">
 					<label>Fecha de carga</label>
 					<div class="input-group date">
-                      <div class="input-group-addon">
-                        <i class="fa fa-calendar"></i>
-                      </div>
-                      <input type="text" class="form-control pull-right fecha" id="fecha_carga_ff" name="fecha_carga_ff" value="<?php echo $row['FECHA_CARGA']; ?>">
-                    </div>
+                <div class="input-group-addon">
+                  <i class="fa fa-calendar"></i>
+                </div>
+                <input type="text" class="form-control pull-right fecha" id="fecha_carga_ff" name="fecha_carga_ff" value="<?php echo $row['FECHA_CARGA']; ?>">
+              </div>
 				 </div>
 				  
                 <div class="form-group">
@@ -62,6 +63,16 @@ include ($_SERVER['DOCUMENT_ROOT']."/Enertrade/php/sections/header.php");
                         <i class="fa fa-calendar"></i>
                       </div>
                       <input type="text" class="form-control pull-right fecha" id="fecha_validacion_ff" name="fecha_validacion_ff" value="<?php echo $row['FECHA_VALIDACION']; ?>">
+                    </div>
+                 </div>
+
+                 <div class="form-group">
+                    <label>Fecha de validación TE</label>
+                    <div class="input-group date">
+                      <div class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                      </div>
+                      <input type="text" class="form-control pull-right fecha" id="fecha_validacion_te_ff" name="fecha_validacion_te_ff" value="<?php echo $row['FECHA_VALIDACION_TE']; ?>">
                     </div>
                  </div>
                   

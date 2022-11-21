@@ -116,14 +116,15 @@ switch ($_POST['action']){
             die;
         }
         
-        $date             = new DateClass;
-        $fecha_carga      = $date->fromToFormat($_POST['fecha_carga_ff'], 'd/m/Y', 'Y-m-d');
-        $fecha_validacion = $date->fromToFormat($_POST['fecha_validacion_ff'], 'd/m/Y', 'Y-m-d');
+        $date                = new DateClass;
+        $fecha_carga         = $date->fromToFormat($_POST['fecha_carga_ff'], 'd/m/Y', 'Y-m-d');
+        $fecha_validacion    = $date->fromToFormat($_POST['fecha_validacion_ff'], 'd/m/Y', 'Y-m-d');
+        $fecha_validacion_te = $date->fromToFormat($_POST['fecha_validacion_te_ff'], 'd/m/Y', 'Y-m-d');
         
         unset($date);
         
         $Conn = new Conn('local', 'enertrade');
-        $Conn->Query("UPDATE seguimiento_cliente_ff SET FECHA_CARGA='$fecha_carga', FECHA_VALIDACION='$fecha_validacion', FACTURAS_CARGADAS='$fras_cargadas', ABONOS_CARGADOS='$abonos_cargados', COMENTARIOS='$comentarios' WHERE ID=$id");
+        $Conn->Query("UPDATE seguimiento_cliente_ff SET FECHA_CARGA='$fecha_carga', FECHA_VALIDACION='$fecha_validacion', FECHA_VALIDACION_TE='$fecha_validacion_te', FACTURAS_CARGADAS='$fras_cargadas', ABONOS_CARGADOS='$abonos_cargados', COMENTARIOS='$comentarios' WHERE ID=$id");
         unset($Conn);
         
         header ('Location: seguimiento_cliente.php');
