@@ -487,6 +487,18 @@ switch ($_POST['action']){
 
                         break;
 
+                    case 'ENERGIA_COLECTIVA':
+
+                        $date = new DateClass;
+                        $linea['Fecha_desde'] = $date->fromToFormat($linea['Fecha_desde']);
+                        $linea['Fecha_hasta'] = $date->fromToFormat($linea['Fecha_hasta']);
+                        $linea['Fecha_factura'] = $date->fromToFormat($linea['Fecha_factura']);
+                        $linea['Fecha_desde_(potencia)'] = $date->fromToFormat($linea['Fecha_desde_(potencia)']);
+                        $linea['Fecha_hasta_(potencia)'] = $date->fromToFormat($linea['Fecha_hasta_(potencia)']);
+                        unset($date);
+                        
+                        break;
+
                         //OTROS CASOS SI HAY
                 }
 //FIN CASOS PARTICULARES DESPUÉS de la elaboración por cada linea del FF
